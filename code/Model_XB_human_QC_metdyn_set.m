@@ -1,4 +1,27 @@
-function [ dYdT, Ftotal, F_active,F_passive,F_active_s,sov_thick, B_process, C_process, dCK, dK3, dCK_r, dPi_cons, dH_cons, dGly, dAdk] = Model_XB_human_QC_metdyn_set(t,y,SLset,par,iemg,Pcr0,met_dyn_set)
+function [ dYdT, Ftotal, F_active,F_passive,F_active_s,sov_thick, B_process, C_process, dCK, dK3, dCK_r, dPi_cons, dH_cons, dGly, dAdk] = Model_XB_human_QC_metdyn_set(t,y,SLset,par,Pu0,Pcr0,met_dyn_set)
+    % Written by: Shivendra Tewari
+    % E-mail: TewariSG@gmail.com
+    % This code simulates sarcomere quick-release experiments based on the
+    % reduced 4-state XB model presented in "Dynamics of cross-bridge cycling, 
+    % ATP hydrolysis, force generation, and deformation in cardiac muscle". For
+    % model equations please refer to the manuscript.
+    % Disclaimer: This code is free to use, edit, reproduce as long as the
+    % source is cited.
+    %            P <--> 1 (t,s)
+    %            |      |
+    %      (t,s) 3 <--> 2 (t,s)
+    % global SLset timrel
+    %% Constants and parameters
+    % Estimated parameters from Pi and ATP data (Average of N=21 GA runs)
+    %par = [4.5397e+02   1.2521e+02   4.1169e+01   1.7553e+01   1.5928e+02   1.5372e+00   8.7750e+01   1.5137e+01 ...
+      %  1.0060e+01   5.0247e+01   9.9383e-03   4.0067e+00   7.2899e+02   5.0129e-01    1.1370e+03   2.5464e+02   1.9066e+04   5.9698e-01];
+    % parameters adjusted based on in vitro protien in solutions from Johnson
+    % et al
+    %% %      kf       kb         k1       k_1         k2         k_2  %%%%%%    k3       alpha1       alpha2        alpha3      s3            K_pi          
+    % par = 1*[7.6e+02  3.0e+02    4.86e+02   1.27e+02   1.5928e+02   1.5372e+00   7.60e+01  1.5137e+01   1.0060e+01   5.0247e+01   9.9383e-03   4.0067e+00 ...
+    %        7.2899e+02   5.0129e-01    1.1370e+03   2.5464e+02   1.9066e+04   2.5e-01 0.38];
+    % %     kpe1         eta          kstiff1       kpe2        kstiff2     K_atp     kf1  
+    %% Estimated Q10s from individual mouse
     
     alpha1 = 1*par(8); % 1/um
     alpha2 = 1*par(9); % 1/um
@@ -6,13 +29,13 @@ function [ dYdT, Ftotal, F_active,F_passive,F_active_s,sov_thick, B_process, C_p
     s3 = 1*par(11);      % um
     %K_Pi = 3.0*par(12);    % mM Pi dissociation constant
     %K_Pi = 3.0*7.07020430862858;    % mM Pi dissociation constant estimated by fitting Broxterman et al 2017
-    K_Pi = par(20);
+    K_Pi = par(19);
     %K_T = 1*par(15);     % mM MgATP dissociation constant
-    K_T = par(21);     % mM MgATP dissociation constant estimated by fitting Broxterman et al 2017 
+    K_T = par(20);     % mM MgATP dissociation constant estimated by fitting Broxterman et al 2017 
     %K_D = 0.4*0.194; % MgADP dissociation constant from Yamashita etal (Circ Res. 1994; 74:1027-33).
     % K_D = 1*0.07; % mM
     %K_D = par(20); % mM
-    K_D = par(22); % mM MgADP dissociation constant estimated by fitting Broxterman et al 2017
+    K_D = par(21); % mM MgADP dissociation constant estimated by fitting Broxterman et al 2017
     %eta = par(24);
     kf1 = par(14); % rate of PCr consumption
     kf2 = par(15); % rate of Pi consumption :without h1 binding polynomial, 0.004
@@ -21,34 +44,30 @@ function [ dYdT, Ftotal, F_active,F_passive,F_active_s,sov_thick, B_process, C_p
     %kad_d=par(21);
     %Kh1 = 3e4*10^-7; % mM without h1 binding polynomial, 6e4*10^-7
     %Kh1 = par(18)*10^-7;
-    Kh1 = par(23); %mM proton dissociation constant estimated by fitting Broxterman et al 2017  
+    Kh1 = par(22); %mM proton dissociation constant estimated by fitting Broxterman et al 2017  
     %kf3 = 7.2e1; % rate of H+ consumption 1/sec
     kf_1 = par(16);
     k_gly = par(17);
-    beta = par(18);
-    k_adk = par(19);
-    dSL_set = par(24);
+    k_adk = par(18);
+    dSL_set = par(23);
     % H = 10^-pH;
     %% State Variables
     P1o = y(1);
     P1i = y(2);
     P1w = y(3);
-    
     P2o = y(4);
     P2i = y(5);
     P2w = y(6);
-    
     P3o = y(7);
     P3i = y(8);
     P3w = y(9);
-    N = y(10);
-    SL = y(11);
-    Pi = y(12);
-    MgADP = y(13);
-    Pcr = y(14);
-    H = y(15); % 10^-pH
-    MgATP=y(16);
-    Pu = 1 - P1o - P2o - P3o-N;
+    SL = y(10);
+    Pi = y(11);
+    MgADP = y(12);
+    Pcr = y(13);
+    H = y(14); % 10^-pH
+    MgATP=y(15);
+    Pu = Pu0 - P1o - P2o - P3o;
     % K_D = K_D*(1/(1+ H/Kh1)); %% Simple modification of ADP dissociation
     % based on protons
     g1 = (MgADP/K_D)/(1 + MgADP/K_D + MgATP/K_T); 
@@ -61,11 +80,9 @@ function [ dYdT, Ftotal, F_active,F_passive,F_active_s,sov_thick, B_process, C_p
     %h1 = 1/(1 + H/Kh1);    
     %h1=1;
     h1=(H/Kh1)/(1 + H/Kh1); h2 = 1/(1 + H/Kh1);
-    % Muscle activation
-    stim=iemg;
-    knp = beta*stim; %% forward rate constant from N to P
-    kpn = beta*(1-stim); %% backward rate constant from P to N
-    % rate paramter                          % Units
+
+    % rate parameter                          % Units
+
     kf = par(1);      % 1/sec
     kb = par(2)*f1;   % 1/sec
     k1 = par(3)*f2;   % 1/sec
@@ -149,7 +166,6 @@ function [ dYdT, Ftotal, F_active,F_passive,F_active_s,sov_thick, B_process, C_p
     %intf = (-Ftotal + F_preload + FSEE); 
     %dSL = (intf/eta_n)*heav(SL-SL_min)*heav(SL_max-SL); 
     dSL = dSL_set; 
-    dN = -knp*N + kpn*Pu;
     dP1o = kf*Pu   - kb*P1o - k1*f_alpha1o + k_1*f_alpha0o;
     dP1i = 1*dSL*P1o - kb*P1i - k1*f_alpha1i + k_1*f_alpha0i;
     dP1w = 2*dSL*P1i - kb*P1w - k1*P1w + k_1*P2w;
@@ -167,8 +183,8 @@ function [ dYdT, Ftotal, F_active,F_passive,F_active_s,sov_thick, B_process, C_p
     dPi = met_dyn_set(1);
     dPi_cons=1.0*kf2*Pi;
     gamma = 0.6; %stoichimetry of proton release from ATP hydrolysis taken from Barclay 2017
-    Ka=1000*10^(-6.75);B = (2.3*Ka*4.7*H)/((Ka+H)^2); delta_pH=7-(-log10((10^-3)*H));
-    %dH = gamma*650*1e-3*k3*f_alpha3o -kf1*Pcr*MgADP- B*delta_pH + k_gly*MgADP*Pi + kf_1*(Pcr0-Pcr)*MgATP;
+    Ka=1000*10^(-6.75);beta = (2.3*Ka*4.7*H)/((Ka+H)^2); delta_pH=7-(-log10((10^-3)*H));
+    %dH = gamma*650*1e-3*k3*f_alpha3o -kf1*Pcr*MgADP- beta*delta_pH + k_gly*MgADP*Pi + kf_1*(Pcr0-Pcr)*MgATP;
     dH = met_dyn_set(2);
     dH_cons= beta*delta_pH;
     %dMgADP = 650*1e-3*k3*f_alpha3o -kf1*Pcr*MgADP -k_gly*MgADP*Pi + kf_1*(Pcr0-Pcr)*MgATP - k_adk*MgADP*MgADP;
@@ -181,5 +197,5 @@ function [ dYdT, Ftotal, F_active,F_passive,F_active_s,sov_thick, B_process, C_p
     dPcr = met_dyn_set(4);
     dCK_r = kf_1*(Pcr0-Pcr)*MgATP;
     dMgATP=-dMgADP;
-    dYdT = [dP1o; dP1i; dP1w; dP2o; dP2i; dP2w; dP3o; dP3i; dP3w; dN;dSL; dPi; dMgADP; dPcr; dH; dMgATP];
+    dYdT = [dP1o; dP1i; dP1w; dP2o; dP2i; dP2w; dP3o; dP3i; dP3w; dSL; dPi; dMgADP; dPcr; dH; dMgATP];
 end 

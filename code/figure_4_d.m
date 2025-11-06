@@ -1,6 +1,6 @@
 %% pre-simulate iemg data
 iemg_table=readtable("../raw_data/iEMG_data_burnley.xlsx");
-iemg_val = iemg_table{:,2};
+iemg_val = iemg_table{:,2}/100;
 %% create the hypothetical parameter sets
 param_table_dke=readtable('params/params.xlsx');
 params_dke = param_table_dke.Values;
@@ -15,7 +15,7 @@ S = cell(n,1);
 for i=1:n
     clear P_state;
     [Y,F,~,~,~]=cycle_1_pi(params_dke,iemg_val(1),Pi_set1(i),met_dyn_set);
-    P_state = 1-Y(:,1)-Y(:,4)-Y(:,7)-Y(:,10);
+    P_state = iemg_val(1)-Y(:,1)-Y(:,4)-Y(:,7);
     S1 = [Y P_state F];
     S{i} = S1;
 end
@@ -28,8 +28,8 @@ for i=1:n
 end
 %% Plot the change in fractions of states with respect to Pi concentration
 figure(32);clf;
-y_labels={'N','P','A1','A2','A3'};
-column_index = [10 17 1 4 7];
+y_labels={'P','A1','A2','A3'};
+column_index = [16 1 4 7];
 q=length(y_labels);
 for i=1:q
     %plot(Pi_set1,final_lvl(:,column_index(i))-final_lvl(1,column_index(i)),'linewidth',2,'DisplayName',y_labels{i}); hold on;

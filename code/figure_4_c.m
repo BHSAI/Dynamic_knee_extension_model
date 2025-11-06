@@ -1,6 +1,6 @@
 %% pre-simulate iemg data
 iemg_table=readtable("../raw_data/iEMG_data_burnley.xlsx");
-iemg_val = iemg_table{:,2};
+iemg_val = iemg_table{:,2}/100;
 %% reading the parameters 
 param_table_dke=readtable('params/params.xlsx');
 params_dke = param_table_dke.Values;

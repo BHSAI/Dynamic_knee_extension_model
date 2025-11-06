@@ -13,7 +13,7 @@ H_lvl=zeros(T_cycles,n);
 ATP_lvl=zeros(T_cycles,n);
 for i=1:n
     params1 = params;
-    params1(23) = params(23)*m_factor(i);
+    params1(22) = params(22)*m_factor(i);
     [~,S,~,~,~,~,~]=sim_dynamics(params1);
     force(:,i)=S(:,6);
     Pi_lvl(:,i)=S(:,1);
@@ -24,9 +24,9 @@ for i=1:n
 end
 %% construct figure 5d
 figure(61);clf;
-plot(m_factor*params(23)*10^3,force(T_cycles,:),'linewidth',2,'Color','k'); hold on;box on;
-xlim([0.3 0.8]);
-ylim([260 360])
+plot(m_factor*params(22)*10^3,force(T_cycles,:),'linewidth',2,'Color','k'); hold on;box on;
+xlim([0.4 1.2]);
+ylim([260 340])
 %xticks(0.25:0.2:0.85)
 %yticks(255:20:355)
 xlabel('K_{H+} (\muM)','Interpreter','tex');

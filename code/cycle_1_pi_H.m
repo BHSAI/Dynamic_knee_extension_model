@@ -12,8 +12,7 @@ function [Y,sim_Ftotal_cycle,integfail_flag,cycle_fail_index,complex_flag]=cycle
     SL0 = 3.23;%2.2; % um [114 mm = 1.3758 um; 116 mm = 1.5869; 118mm = 1.8114; 120mm = 2.0403; 128 mm = 2.8346; 130mm = 2.9728; 132mm= 3.0980]
     H = H_set;
     %H = data_resting{3,2}; % Experimentally estimated resting levels by Umass team
-    N0=0.95;
-    init = [zeros(1,9),N0,SL0, Pi,MgADP, Pcr,H,MgATP]; % Initial conditions for the model
+    init = [zeros(1,9),SL0, Pi,MgADP, Pcr,H,MgATP]; % Initial conditions for the model
     cycle_time=3;% 3s contraction 2s relaxation in Broxtermann et al., 2017; 
     tspan = 0:0.1:cycle_time;
     n=length(tspan);

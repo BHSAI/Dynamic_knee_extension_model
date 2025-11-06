@@ -6,14 +6,16 @@ function [error,S,sim_Ftotal_cycles,R,integfail_flag,cycle_fail_index,complex_fl
     % Experimental data
     data_Pcr  = readtable('../raw_data/PCr_data_broxterman.csv'); % Pcr
     data_Pi  = readtable('../raw_data/Pi_data_broxterman.csv'); % Pi 
-    data_ADP  = readtable('../raw_data/ADP_data_broxterman.xlsx'); % ADP 
+    %data_ADP  = readtable('data_exp/ADP_data_broxterman.xlsx'); % ADP 
+    data_proton  = readtable('../raw_data/proton_data_broxterman.xlsx'); % proton
     data_force = readtable('../raw_data/force_data_broxterman.csv'); % force
     data_resting=readtable("../raw_data/initial_state.xlsx"); % resting levels of state variables
     cycle_index_exp=1:60; % Broxtermann et al 2017 conducted 60 maximum voluntary contraction 
     cycle_start_time=1:5:300;
     p1 = data_Pcr{2:end,2};
     p2 = data_Pi{2:end,2};
-    p3 = 10^-3*data_ADP{2:end,2};
+    %p3 = 10^-3*data_ADP{2:end,2};
+    p3 = data_proton{2:end,2};
     p4 = data_force{1:end,2};
     % Set metabolite concentrations, 
     MgATP = 8.2; % Assumption made in Broxtermann et al 2017  
@@ -24,14 +26,15 @@ function [error,S,sim_Ftotal_cycles,R,integfail_flag,cycle_fail_index,complex_fl
     %Pcr = 40; % Experimentally estimated resting levels by Umass team
     SL0 = 3.23;%2.2; % um [114 mm = 1.3758 um; 116 mm = 1.5869; 118mm = 1.8114; 120mm = 2.0403; 128 mm = 2.8346; 130mm = 2.9728; 132mm= 3.0980]
     H = data_resting{3,2}; % Experimentally estimated resting levels by Umass team
-    N0=0.95;
-    init = [zeros(1,9),N0,SL0, Pi,MgADP, Pcr,H,MgATP]; % Initial conditions for the model
+    init = [zeros(1,9),SL0, Pi,MgADP, Pcr,H,MgATP]; % Initial conditions for the model
     cycles=1:1:max(cycle_index_exp);
     cycle_time=3;% 3s contraction 2s relaxation in Broxtermann et al., 2017; 
     tspan = 0:0.1:cycle_time;
     n=length(tspan);
     m=length(cycles);
     pi_p=zeros(m,1);
+    Pu_init = zeros(m,3);
+    Pu_fin = zeros(m,3);
     ADP_p=zeros(m,1);
     Pcr_p=zeros(m,1);
     H_p=zeros(m,1);
@@ -71,17 +74,20 @@ function [error,S,sim_Ftotal_cycles,R,integfail_flag,cycle_fail_index,complex_fl
             cycle_fail_index=i;
         break   
         end
-        init(10)=Y(n,10);%N
-        init(12)=Y(n,12);%Pi
-        init(13)=Y(n,13);%ADP
-        init(14)=Y(n,14);%Pcr
-        init(15)=Y(n,15);%H
-        init(16)=Y(n,16);%ATP
-        pi_p(i)=Y(n,12);
-        ADP_p(i)=Y(n,13);
-        Pcr_p(i)=Y(n,14);
-        H_p(i)=Y(n,15);
-        ATP_p(i)=Y(n,16);
+        init(11)=Y(n,11);%Pi
+        init(12)=Y(n,12);%ADP
+        init(13)=Y(n,13);%Pcr
+        init(14)=Y(n,14);%H
+        init(15)=Y(n,15);%ATP
+        %Pu_init(i) =iemg-Y(1,1)+Y(1,2)+Y(1,6);
+        %Pu_fin(i) =iemg-Y(n,1)+Y(n,2)+Y(n,6);
+        Pu_init(i,:) =[Y(1,1) Y(1,4) Y(1,7)];
+        Pu_fin(i,:) =[Y(n,1) Y(n,4) Y(n,7)];
+        pi_p(i)=Y(n,11);
+        ADP_p(i)=Y(n,12);
+        Pcr_p(i)=Y(n,13);
+        H_p(i)=Y(n,14);
+        ATP_p(i)=Y(n,15);
         for j=1:n
             [~, sim_Ftotal_cycles(j,i),~,~,~,~,~,~,dCK_cycle(j,i),dK3_cycle(j,i),dCK_r_cycle(j,i),dPi_cons_cycle(j,i),dH_cons_cycle(j,i),dGly_cons_cycle(j,i),dAdk_cons_cycle(j,i)] = Model_XB_human_QC(T(j),Y(j,:),SL_set,params,iemg,Pcr);
         end
@@ -104,11 +110,12 @@ function [error,S,sim_Ftotal_cycles,R,integfail_flag,cycle_fail_index,complex_fl
     if ~isreal(S)
         complex_flag =1;
     end
-    err1 = sum(((Pcr_p-p1)/max(p2)).^2);
+    err1 = sum(((Pcr_p-p1)/max(p1)).^2);
     err2 = sum(((pi_p-p2)/max(p2)).^2);
-    err3 = sum(((ADP_p-p3)/max(p3)).^2);
+    %err3 = sum(((ADP_p-p3)/max(p3)).^2);
+    err3 = sum(((H_p-p3)/max(p3)).^2);
     err4 = sum(((sim_Ftotal_3s-p4)/max(p4)).^2);
     err5 = sum(((sim_Ftotal_2s-p4)/max(p4)).^2);
     err6 = sum(((sim_Ftotal_1s-p4)/max(p4)).^2);
-    error = err1+err2+err3+err4+err5+err6;    
+    error = err1+err2+err3+err4+err5+err6;  
 end

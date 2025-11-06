@@ -18,8 +18,7 @@ function [error,S,sim_Ftotal_cycles,R,integfail_flag,cycle_fail_index,complex_fl
     %Pcr = 40; % Experimentally estimated resting levels by Umass team
     SL0 = 3.23;%2.2; % um [114 mm = 1.3758 um; 116 mm = 1.5869; 118mm = 1.8114; 120mm = 2.0403; 128 mm = 2.8346; 130mm = 2.9728; 132mm= 3.0980]
     H = data_resting{3,2}; % Experimentally estimated resting levels by Umass team
-    N0=0.95;
-    init = [zeros(1,9),N0,SL0, Pi,MgADP, Pcr,H,MgATP]; % Initial conditions for the model
+    init = [zeros(1,9),SL0, Pi,MgADP, Pcr,H,MgATP]; % Initial conditions for the model
     %cycles=1:1:max(cycle_index_exp);
     cycle_time=3;% 3s contraction 2s relaxation in Broxtermann et al., 2017; 
     tspan = 0:0.1:cycle_time;
@@ -67,17 +66,16 @@ function [error,S,sim_Ftotal_cycles,R,integfail_flag,cycle_fail_index,complex_fl
             cycle_fail_index=i;
         break   
         end
-        init(10)=Y(n,10);%N
-        init(12)=Y(n,12);%Pi
-        init(13)=Y(n,13);%ADP
-        init(14)=Y(n,14);%Pcr
-        init(15)=Y(n,15);%H
-        init(16)=Y(n,16);%ATP
-        pi_p(i)=Y(n,12);
-        ADP_p(i)=Y(n,13);
-        Pcr_p(i)=Y(n,14);
-        H_p(i)=Y(n,15);
-        ATP_p(i)=Y(n,16);
+        init(11)=Y(n,11);%Pi
+        init(12)=Y(n,12);%ADP
+        init(13)=Y(n,13);%Pcr
+        init(14)=Y(n,14);%H
+        init(15)=Y(n,15);%ATP
+        pi_p(i)=Y(n,11);
+        ADP_p(i)=Y(n,12);
+        Pcr_p(i)=Y(n,13);
+        H_p(i)=Y(n,14);
+        ATP_p(i)=Y(n,15);
         for j=1:n
             [~, sim_Ftotal_cycles(j,i),~,~,~,~,~,~,dCK_cycle(j,i),dK3_cycle(j,i),dCK_r_cycle(j,i),dPi_cons_cycle(j,i),dH_cons_cycle(j,i),dGly_cons_cycle(j,i),dAdk_cons_cycle(j,i)] = Model_XB_human_QC(T(j),Y(j,:),SL_set,params,iemg,Pcr);
         end
@@ -102,7 +100,8 @@ function [error,S,sim_Ftotal_cycles,R,integfail_flag,cycle_fail_index,complex_fl
     end
     err1 = sum(((Pcr_p-p1)/max(p2)).^2);
     err2 = sum(((pi_p-p2)/max(p2)).^2);
-    err3 = sum(((ADP_p-p3)/max(p3)).^2);
+    %err3 = sum(((ADP_p-p3)/max(p3)).^2);
+    err3 = sum(((H_p-p3)/max(p3)).^2);
     err4 = sum(((sim_Ftotal_3s-p4)/max(p4)).^2);
     err5 = sum(((sim_Ftotal_2s-p4)/max(p4)).^2);
     err6 = sum(((sim_Ftotal_1s-p4)/max(p4)).^2);

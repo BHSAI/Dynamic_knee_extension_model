@@ -1,5 +1,4 @@
 %% sort sensitivities
-clf;
 params_table = readtable('params/params.xlsx');
 params = params_table.Parameter;
 sens_force = readtable('../raw_data/Local_sens_Force.xlsx');
@@ -7,7 +6,7 @@ sens_force = readtable('../raw_data/Local_sens_Force.xlsx');
 sens_c60_sort=sens_force.c60(I);
 %% plot sensitivities
 figure(7);clf;
-scatter(1:1:24,sens_c60_sort,30,"black","square","filled"); hold on;box on;
+scatter(1:1:23,sens_c60_sort,30,"black","square","filled"); hold on;box on;
 ylim([-2 2]);
 xlabel('Parameters');
 ylabel('Sensitivity');
