@@ -1,27 +1,4 @@
 function [ dYdT, Ftotal, F_active,F_passive,F_active_s,sov_thick, B_process, C_process, dCK, dK3, dCK_r, dPi_cons, dH_cons, dGly, dAdk] = Model_XB_human_QC_metdyn_set(t,y,SLset,par,Pu0,Pcr0,met_dyn_set)
-    % Written by: Shivendra Tewari
-    % E-mail: TewariSG@gmail.com
-    % This code simulates sarcomere quick-release experiments based on the
-    % reduced 4-state XB model presented in "Dynamics of cross-bridge cycling, 
-    % ATP hydrolysis, force generation, and deformation in cardiac muscle". For
-    % model equations please refer to the manuscript.
-    % Disclaimer: This code is free to use, edit, reproduce as long as the
-    % source is cited.
-    %            P <--> 1 (t,s)
-    %            |      |
-    %      (t,s) 3 <--> 2 (t,s)
-    % global SLset timrel
-    %% Constants and parameters
-    % Estimated parameters from Pi and ATP data (Average of N=21 GA runs)
-    %par = [4.5397e+02   1.2521e+02   4.1169e+01   1.7553e+01   1.5928e+02   1.5372e+00   8.7750e+01   1.5137e+01 ...
-      %  1.0060e+01   5.0247e+01   9.9383e-03   4.0067e+00   7.2899e+02   5.0129e-01    1.1370e+03   2.5464e+02   1.9066e+04   5.9698e-01];
-    % parameters adjusted based on in vitro protien in solutions from Johnson
-    % et al
-    %% %      kf       kb         k1       k_1         k2         k_2  %%%%%%    k3       alpha1       alpha2        alpha3      s3            K_pi          
-    % par = 1*[7.6e+02  3.0e+02    4.86e+02   1.27e+02   1.5928e+02   1.5372e+00   7.60e+01  1.5137e+01   1.0060e+01   5.0247e+01   9.9383e-03   4.0067e+00 ...
-    %        7.2899e+02   5.0129e-01    1.1370e+03   2.5464e+02   1.9066e+04   2.5e-01 0.38];
-    % %     kpe1         eta          kstiff1       kpe2        kstiff2     K_atp     kf1  
-    %% Estimated Q10s from individual mouse
     
     alpha1 = 1*par(8); % 1/um
     alpha2 = 1*par(9); % 1/um
