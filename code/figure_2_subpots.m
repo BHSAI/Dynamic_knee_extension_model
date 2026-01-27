@@ -33,7 +33,7 @@ for i=1:q
     y_txt=0.05;
     if i==4
         plot(cycles,-log10(S(:,i)*10^-3),'linewidth',2,'Color','k'); hold on;
-        scatter(cycles,-log10(exp_data(:,i)*10^-3),20,'MarkerEdgeColor',[1 1 1]*0.5,'MarkerFaceColor',[1 1 1]*0.5,'Marker','square');
+        scatter(cycles,-log10(exp_data(:,i)*10^-3),10,'MarkerEdgeColor',[1 1 1]*0.5,'MarkerFaceColor',[1 1 1]*0.5,'Marker','o');
         %diff = (S(:,i) - exp_data(:,i))*10^6;
         diff = (-log10(S(:,i)*10^-3))-(-log10(exp_data(:,i)*10^-3));
         rmsd(i)= rms(diff);
@@ -45,7 +45,7 @@ for i=1:q
         plot(cycles,S(:,i),'linewidth',2,'Color','k');ylim([0 inf]);
     else
         plot(cycles,S(:,i),'linewidth',2,'Color','k'); hold on;
-        scatter(cycles,exp_data(:,i),20,'MarkerEdgeColor',[1 1 1]*0.5,'MarkerFaceColor',[1 1 1]*0.5,'Marker','square');
+        scatter(cycles,exp_data(:,i),10,'MarkerEdgeColor',[1 1 1]*0.5,'MarkerFaceColor',[1 1 1]*0.5,'Marker','o');
         diff = S(:,i) - exp_data(:,i);
         rmsd(i)= rms(diff);
         rmse_string = sprintf('RMSE: %1.1f %s',rmsd(i),rmsd_unit{i});

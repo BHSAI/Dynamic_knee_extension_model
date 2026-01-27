@@ -32,7 +32,7 @@ column_index = [16 1 4 7];
 q=length(y_labels);
 for i=1:q
     %plot(H_set1*10^6,final_lvl(:,column_index(i))-final_lvl(1,column_index(i)),'linewidth',2,'DisplayName',y_labels{i}); hold on;
-    scatter(H_set1*10^6,final_lvl(:,column_index(i))-final_lvl(1,column_index(i)),'filled','s','DisplayName',y_labels{i}); hold on; box on;
+    scatter(H_set1*10^6,final_lvl(:,column_index(i))-final_lvl(1,column_index(i)),12.5,'filled','o','DisplayName',y_labels{i}); hold on; box on;
 end
 legend('Location','eastoutside','NumColumns',1,'Box','off')
 xlim([100 350]);

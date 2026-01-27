@@ -7,7 +7,7 @@ sens = readmatrix('../raw_data/global_sens_cyc_10000_0.1.xlsx');
 sens_sort = sens(I,:);
 %% plot sensitivities
 figure(8);clf;
-boxplot(sens_sort','Colors','k',"Symbol",".","OutlierSize",0.1);hold on;box on;
+boxplot(sens_sort','Colors','b',"Symbol",".","OutlierSize",0.1);hold on;box on;
 ylim([-2,2]);
 xlabel('Parameters');
 ylabel('Sensitivity');

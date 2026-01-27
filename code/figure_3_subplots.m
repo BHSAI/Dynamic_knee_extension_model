@@ -29,9 +29,9 @@ end
 %% Construct figure 3b
 figure(2);clf;
 x=1:m;
-plot(x,force(1,:),'linewidth',2,'Color','k'); hold on;
-plot(x,force(2,:),'linewidth',2,'Color','k','LineStyle','--');
-plot(x,force(3,:),'linewidth',2,'Color','k','LineStyle','-.');
+plot(x,force(1,:),'linewidth',1.25,'Color','k'); hold on;
+plot(x,force(2,:),'linewidth',1.25,'Color','b');
+plot(x,force(3,:),'linewidth',1.25,'Color','m');
 xlim([0 60]);
 ylim([200 700]);
 xlabel('Cycle index');
@@ -43,9 +43,9 @@ exportgraphics(figure(2),fullfile('figure_3_subplots','figure_6_b.pdf'),'Backgro
 %% Construct figure 3a
 figure(3);clf;
 x=1:m;
-plot(x,iemg_profile(1,:)*100,'linewidth',2,'Color','k'); hold on;
-plot(x,iemg_profile(2,:)*100,'linewidth',2,'Color','k','LineStyle','--');
-plot(x,iemg_profile(3,:)*100,'linewidth',2,'Color','k','LineStyle','-.');
+plot(x,iemg_profile(1,:)*100,'linewidth',1.25,'Color','k'); hold on;
+plot(x,iemg_profile(2,:)*100,'linewidth',1.25,'Color','b');
+plot(x,iemg_profile(3,:)*100,'linewidth',1.25,'Color','m');
 xlim([0 60]);
 ylim([40 120]);
 xlabel('Cycle index');
